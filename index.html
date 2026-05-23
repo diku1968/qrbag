@@ -97,21 +97,23 @@
     </div>
 
     <div id="viewer-container">
-        <model-viewer 
-            src="v2.glb" 
-            ios-src="v2.usdz"
-            alt="My custom 3D model" 
-            ar 
-            ar-modes="webxr scene-viewer quick-look" 
-            camera-controls 
-            auto-rotate 
-            shadow-intensity="1">
-            
-            <button slot="ar-button" class="btn" style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: auto; z-index: 99;">
-                👋 Place Model on your Floor
-            </button>
-        </model-viewer>
-    </div>
+    <model-viewer 
+        src="v2.glb" 
+        ios-src="v2.usdz"
+        alt="My animated 3D model" 
+        ar 
+        ar-modes="webxr scene-viewer quick-look" 
+        camera-controls 
+        shadow-intensity="1"
+        
+        autoplay
+        animation-name="*">
+        
+        <button slot="ar-button" class="btn" style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: auto; z-index: 99;">
+            👋 Place Model on your Floor
+        </button>
+    </model-viewer>
+</div>
 
     <script>
         // Dynamically track current hosting URL 
