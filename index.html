@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D WebAR Experience</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #121214;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Container for Desktop/QR setup view */
+        #setup-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .qr-card {
+            background: #1f1f23;
+            padding: 30px;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            max-width: 340px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #qrcode canvas {
+            border: 12px solid white;
+            border-radius: 12px;
+            max-width: 100%;
+        }
+
+        .btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.2s;
+            width: 100%;
+        }
+        .btn:hover { background: #2563eb; }
+
+        /* Container for 3D Viewer (Hidden on desktop initially, fills screen on mobile) */
+        #viewer-container {
+            display: none;
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        model-viewer {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Responsive handling */
+        @media (max-width: 768px) {
+            #setup-container { display: none; }
+            #viewer-container { display: block; }
+        }
+    </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.2.0/model-viewer.min.js"></script>
+</head>
+<body>
+
+    <div id="setup-container">
+        <div class="qr-card">
+            <h2>Scan to view 3D Model</h2>
+            <p style="color: #a1a1aa; margin-bottom: 20px; font-size: 14px;">
+                Scan this with your mobile phone camera to place the 3D asset into your room.
+            </p>
+            <div id="qrcode"></div>
+            <button class="btn" id="download-btn">Download QR Code</button>
+        </div>
+    </div>
+
+    <div id="viewer-container">
+        <model-viewer 
+            src="v2.glb" 
+            ios-src="v2.usdz"
+            alt="My custom 3D model" 
+            ar 
+            ar-modes="webxr scene-viewer quick-look" 
+            camera-controls 
+            auto-rotate 
+            shadow-intensity="1">
+            
+            <button slot="ar-button" class="btn" style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: auto; z-index: 99;">
+                👋 Place Model on your Floor
+            </button>
+        </model-viewer>
+    </div>
+
+    <script>
+        // Dynamically track current hosting URL 
+        let currentUrl = window.location.href;
+        
+        // If testing on local environments, generate a fallback code for testing
+        if(currentUrl.includes("127.0.0.1") || currentUrl.includes("localhost") || currentUrl.startsWith("file://")) {
+            console.warn("Running locally. QR Code will direct to sample site since local paths aren't accessible over the internet.");
+            currentUrl = "https://modelviewer.dev/"; 
+        }
+
+        // Generate the QR code matrix layout dynamically
+        const qrContainer = document.getElementById("qrcode");
+        const qrcode = new QRCode(qrContainer, {
+            text: currentUrl,
+            width: 256,
+            height: 256,
+            colorDark : "#000000",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
+        });
+
+        // Download trigger event handler
+        document.getElementById("download-btn").addEventListener("click", () => {
+            const canvas = qrContainer.querySelector("canvas");
+            if (canvas) {
+                const imageUri = canvas.toDataURL("image/png");
+                const link = document.createElement("a");
+                link.download = "ar-experience-qrcode.png";
+                link.href = imageUri;
+                link.click();
+            }
+        });
+    </script>
+</body>
+</html>
